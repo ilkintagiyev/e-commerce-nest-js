@@ -10,6 +10,23 @@ export class ProductsController {
         return this.productsService.findAll(mainCategoryId ? +mainCategoryId : undefined);
     }
 
+    @Get('filter')
+    findFiltered(
+        @Query('minPrice') minPrice?: string,
+        @Query('maxPrice') maxPrice?: string,
+        @Query('productName') productName?: string,
+        @Query('mainCategoryId') mainCategoryId?: string,
+        @Query('categoryId') categoryId?: string,
+    ) {
+        return this.productsService.findFiltered({
+            minPrice: minPrice ? +minPrice : undefined,
+            maxPrice: maxPrice ? +maxPrice : undefined,
+            productName,
+            mainCategoryId: mainCategoryId ? +mainCategoryId : undefined,
+            categoryId: categoryId ? +categoryId : undefined,
+        });
+    }
+
     @Get('discounted')
     findDiscounted() {
         return this.productsService.findDiscounted();

@@ -7,6 +7,7 @@ export class CategoriesController {
 
   @Get()
   findAll(@Query('mainCategoryId') mainCategoryId?: string) {
+    console.log("hello")
     if (mainCategoryId) {
       return this.categoriesService.findByMainCategory(+mainCategoryId);
     }

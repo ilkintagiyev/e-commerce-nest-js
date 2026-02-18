@@ -33,6 +33,42 @@ export class ProductsService {
     });
   }
 
+  async findFiltered(filters: {
+    minPrice?: number;
+    maxPrice?: number;
+    productName?: string;
+    mainCategoryId?: number;
+    categoryId?: number;
+  }) {
+    const { minPrice, maxPrice, productName, mainCategoryId, categoryId } = filters;
+
+    const query = this.productRepo.createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('category.mainCategory', 'mainCategory');
+
+    if (minPrice !== undefined) {
+      query.andWhere('product.price >= :minPrice', { minPrice });
+    }
+
+    if (maxPrice !== undefined) {
+      query.andWhere('product.price <= :maxPrice', { maxPrice });
+    }
+
+    if (productName) {
+      query.andWhere('product.name ILIKE :productName', { productName: `%${productName}%` });
+    }
+
+    if (mainCategoryId) {
+      query.andWhere('mainCategory.id = :mainCategoryId', { mainCategoryId });
+    }
+
+    if (categoryId) {
+      query.andWhere('category.id = :categoryId', { categoryId });
+    }
+
+    return query.getMany();
+  }
+
   async findOne(id: number) {
     const product = await this.productRepo.findOne({
       where: { id },
@@ -65,16 +101,6 @@ export class ProductsService {
 
     if (!category) throw new NotFoundException('Kateqoriya tapılmadı');
 
-    // const product = this.productRepo.create({
-    //   name: data.name,
-    //   description: data.description,
-    //   price: data.price,
-    //   stock: data.stock,
-    //   category,
-    //   discountPrice: data.discountPrice || null,
-    // });
-
-    // return this.productRepo.save(product);
   }
 
   async findDiscounted() {
